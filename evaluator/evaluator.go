@@ -5,7 +5,6 @@ import (
 
 	"github.com/Tyler-Meador/monkey-lang-go/monkey-lang-go/ast"
 	"github.com/Tyler-Meador/monkey-lang-go/monkey-lang-go/object"
-	"github.com/emirpasic/gods/trees/avltree"
 )
 
 var (
