@@ -342,6 +342,14 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 			"add(a + b + c * d / f + g)",
 			"add((((a + b) + ((c * d) / f)) + g))",
 		},
+		{
+			"a * [1, 2, 3, 4][b * c] * d",
+			"((a * ([1, 2, 3, 4][(b * c)])) * d)",
+		},
+		{
+			"add(a * b[2], b[1], 2 * [1, 2][1])",
+			"add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))",
+		},
 	}
 
 	for _, tt := range tests {
@@ -687,6 +695,26 @@ func TestStringLiteralExpression(t *testing.T) {
 
 	if literal.Value != "hello world" {
 		t.Errorf("literal.Value not %q. got=%q", "hello world", literal.Value)
+	}
+}
+
+func TestParsingEmptyArrayLiterals(t *testing.T) {
+	input := "[]"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	array, ok := stmt.Expression.(*ast.ArrayLiteral)
+
+	if !ok {
+		t.Fatalf("exp not ast.ArrayLiteral. got=%T", stmt.Expression)
+	}
+
+	if len(array.Elements) != 0 {
+		t.Errorf("len(array.Elements) not 0. got=%d", len(array.Elements))
 	}
 }
 
