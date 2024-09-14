@@ -1,9 +1,10 @@
 package ast
 
-type ModifiedFunc func(Node) Node
+type ModifierFunc func(Node) Node
 
-func Modify(node Node, modifier ModifiedFunc) Node {
+func Modify(node Node, modifier ModifierFunc) Node {
 	switch node := node.(type) {
+
 	case *Program:
 		for i, statement := range node.Statements {
 			node.Statements[i], _ = Modify(statement, modifier).(Statement)
@@ -31,7 +32,7 @@ func Modify(node Node, modifier ModifiedFunc) Node {
 		}
 
 	case *BlockStatement:
-		for i := range node.Statements {
+		for i, _ := range node.Statements {
 			node.Statements[i], _ = Modify(node.Statements[i], modifier).(Statement)
 		}
 
@@ -42,14 +43,13 @@ func Modify(node Node, modifier ModifiedFunc) Node {
 		node.Value, _ = Modify(node.Value, modifier).(Expression)
 
 	case *FunctionLiteral:
-		for i := range node.Parameters {
+		for i, _ := range node.Parameters {
 			node.Parameters[i], _ = Modify(node.Parameters[i], modifier).(*Identifier)
 		}
-
 		node.Body, _ = Modify(node.Body, modifier).(*BlockStatement)
 
 	case *ArrayLiteral:
-		for i := range node.Elements {
+		for i, _ := range node.Elements {
 			node.Elements[i], _ = Modify(node.Elements[i], modifier).(Expression)
 		}
 
@@ -60,8 +60,8 @@ func Modify(node Node, modifier ModifiedFunc) Node {
 			newVal, _ := Modify(val, modifier).(Expression)
 			newPairs[newKey] = newVal
 		}
-
 		node.Pairs = newPairs
+
 	}
 
 	return modifier(node)

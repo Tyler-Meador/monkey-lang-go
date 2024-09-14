@@ -33,6 +33,15 @@ func evalUnquoteCalls(quoted ast.Node, env *object.Environment) ast.Node {
 	})
 }
 
+func isUnquoteCall(node ast.Node) bool {
+	callExpression, ok := node.(*ast.CallExpression)
+	if !ok {
+		return false
+	}
+
+	return callExpression.Function.TokenLiteral() == "unquote"
+}
+
 func convertObjectToASTNode(obj object.Object) ast.Node {
 	switch obj := obj.(type) {
 	case *object.Integer:
@@ -57,13 +66,4 @@ func convertObjectToASTNode(obj object.Object) ast.Node {
 	default:
 		return nil
 	}
-}
-
-func isUnquoteCall(node ast.Node) bool {
-	callExpression, ok := node.(*ast.CallExpression)
-	if !ok {
-		return false
-	}
-
-	return callExpression.Function.TokenLiteral() == "unquote"
 }
